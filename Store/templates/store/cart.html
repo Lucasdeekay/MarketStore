@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<main>
+    <section class="cart-items">
+        {% for product in products %}
+        <div class="cart-item">
+            <img src="/media/{{ product.image }}" alt="{{ product.name }}">
+            <div class="item-details">
+                <h2>{{ product.name }}</h2>
+                <p>Description: ${{ product.description }}</p>
+                <p>Price: ${{ product.price }}</p>
+                <p>Quantity: {{ product.quantity }}</p>
+                <p>Amount: ${{ product.amount }}</p>
+                <a href="{% url 'Store:remove_order' product.id %}"><button class="remove-item">Remove</button></a>
+            </div>
+        </div>
+        {% endfor %}
+    </section>
+
+    <section class="cart-summary">
+        <h2>Cart Summary</h2>
+        <div class="summary-details">
+            <p>Total: ${{ total_sum }}</p>
+        </div>
+        <a href="{% url 'Store:checkout' %}"><button class="checkout-button">Checkout</button></a>
+    </section>
+</main>
+{% endblock content %}

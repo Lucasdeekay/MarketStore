@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<main>
+    <section class="store">
+        <div class="store-info">
+            <h2>{{ product.name }}</h2>
+            <p>Category: {{ product.category.name }}</p>
+            <p>Description: {{ product.description }}</p>
+            <p>Price: {{ product.price }}</p>
+            <div>
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <label for="quantity">Quantity</label>
+                    <input type="number" name="quantity" id="quantity"><br>
+                    <button style="margin:10px" type="submit" class="add-to-cart">Add to Cart</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="store-image">
+            <img src="/media/{{ product.image }}" alt="{{ product.name }}">
+        </div>
+    </section>
+</main>
+{% endblock content %}

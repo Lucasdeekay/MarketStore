@@ -1,1 +1,25 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h2>Welcome to Angel Aesthetics</h2>
+        <p>Your one-stop destination for beauty and wellness products.</p>
+    </div>
+</section>
+
+<section class="featured-products">
+    <h2>Featured Product Categories</h2>
+    <div class="product-grid">
+        {% for category in all_categories %}
+        <div class="product-item">
+            <img src="/media/{{ category.image }}" alt="Product 1">
+            <h3>{{ category.name }}</h3>
+            <p>{{ category.description }}</p>
+            <a href="{% url 'Store:store' category.id %}" class="cta-button">View Products</a>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock content %}

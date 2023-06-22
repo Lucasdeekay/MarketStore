@@ -467,3 +467,23 @@ footer {
   text-align: center;
   color: #ffffff;
 }
+table {
+  width: 100%;
+}
+thead tr {
+  background-color: #f1c3a0;
+}
+table {
+  border-collapse: collapse;
+  vertical-align: center;
+}
+th {
+  padding: 10px;
+}
+tbody tr {
+  background-color: chocolate;
+}
+td {
+  padding: 10px;
+  color: white;
+}

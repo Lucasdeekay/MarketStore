@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<main>
+    <section class="cart-items">
+        <h2>Transactions</h2>
+        <div class="product-grid">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Product</th>
+                        <th>Amount</th>
+                        <th>Trans. Id</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for trans in transactions %}
+                    <tr>
+                        <td>{{ trans.customer.username }}</td>
+                        <td>
+                            {% for order in trans.cart.orders.all() %}
+                            {{ order.product.name }}<br>
+                            {% endfor %}
+                        </td>
+                        <td>$ {{ trans.cart.total_amount }}</td>
+                        <td>{{ trans.transaction_id }}</td>
+                        <td>{{ trans.date }}</td>
+                        <td>
+                            {% if trans.is_success %}
+                            <b style="color: rgb(19, 116, 19);">Success</b>
+                            {% else %}
+                            <b style="color: rgb(236, 201, 0);">Pending</b>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</main>
+{% endblock content %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<main>
+    <h2>{{ category.name }}</h2>
+    <section class="store">
+        <div class="store-items">
+            {% for product in products %}
+            <div class="store-item">
+                <img src="/media/{{ product.image }}" alt="{{ product.name }}">
+                <h3>{{ product.name }}</h3>
+                <p>Price: ${{ product.price }}</p>
+                <a href="{% url 'Store:product' product.id %}"><button class="add-to-cart">View Product</button></a>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</main>
+{% endblock content %}

@@ -2,7 +2,7 @@ import string
 import random
 
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 
-from Store.models import Product, Customer, Cart, Order, Transaction
+from Store.models import Product, Customer, Cart, Order, Transaction, Category
 
 random = random.Random()
 
@@ -48,11 +48,6 @@ class LoginView(View):
 
 
 class RegisterView(View):
-    template_name = "store/register.html"
-
-    def get(self, request):
-        # Go to the register page
-        return render(request, self.template_name)
 
     def post(self, request):
         # Check if form is submitting
@@ -79,12 +74,12 @@ class RegisterView(View):
                     # Send error message
                     messages.error(request, "Password does not match")
                     # Redirect back to register page
-                    return HttpResponseRedirect(reverse("Store:register"))
+                    return HttpResponseRedirect(reverse("Store:login"))
             else:
                 # Send error message
                 messages.error(request, "Username already exists")
                 # Redirect back to register page
-                return HttpResponseRedirect(reverse("Store:register"))
+                return HttpResponseRedirect(reverse("Store:login"))
 
 
 class ForgotPasswordView(View):
@@ -135,13 +130,27 @@ class HomeView(View):
     template_name = "store/home.html"
 
     def get(self, request):
-        all_products = Product.objects.all()
-        context = {"all_products": all_products}
+        all_categories = Category.objects.all()
+        context = {"all_categories": all_categories}
 
         if request.user.is_authenticated() and not request.user.is_superuser():
             customer = Customer.objects.get(user=request.user)
-            cart = Cart.objects.get(customer=customer)
-            context = {"customer": customer, "cart": cart, "all_products": all_products}
+            context = {"customer": customer, "all_categories": all_categories}
+
+        return render(request, self.template_name, context=context)
+
+
+class StoreView(View):
+    template_name = "store/store.html"
+
+    def get(self, request, id):
+        category = Category.objects.get(id=id)
+        products = Product.objects.filter(category=category)
+        context = {"products": products}
+
+        if request.user.is_authenticated() and not request.user.is_superuser():
+            customer = Customer.objects.get(user=request.user)
+            context = {"customer": customer, "category": category, "products": products}
 
         return render(request, self.template_name, context=context)
 
@@ -155,8 +164,7 @@ class ProductView(View):
 
         if request.user.is_authenticated() and not request.user.is_superuser():
             customer = Customer.objects.get(user=request.user)
-            cart = Cart.objects.get(customer=customer)
-            context = {"customer": customer, "cart": cart, "product": product}
+            context = {"customer": customer, "product": product}
 
         return render(request, self.template_name, context=context)
 
@@ -167,10 +175,12 @@ class ProductView(View):
         customer = Customer.objects.get(user=request.user)
         product = Product.objects.get(id=id)
         cart = Cart.objects.get(customer=customer)
+        amount = product.price * quantity
 
-        if quantity > 0:
-            order = Order.objects.create(customer=customer, product=product, quantity=quantity)
+        if int(quantity) > 0:
+            order = Order.objects.create(customer=customer, product=product, quantity=quantity, amount=amount)
             cart.orders.add(order)
+            cart.calculate_total_cost()
             cart.save()
             messages.success(request, "Order added to cart")
             return HttpResponseRedirect(reverse("Store:cart"))
@@ -185,8 +195,30 @@ class CartView(View):
     @method_decorator(login_required())
     def get(self, request):
         customer = Customer.objects.get(user=request.user)
-        cart = Cart.objects.get(customer=customer)
-        context = {"customer": customer, "cart": cart}
+        carts = Cart.objects.filter(customer=customer, order_placed=False)
+        transactions = Transaction.objects.filter(customer=customer, is_success=True)
+        for cart in carts:
+            for trans in transactions:
+                if trans.cart == cart:
+                    cart.order_placed = True
+                    cart.save()
+
+        cart = Cart.objects.filter(customer=customer, order_placed=False)
+        products = [
+            {
+                "id": order.id,
+                "name": order.product.name,
+                "quantity": order.quantity,
+                "amount": order.amount,
+                "price": order.product.price,
+                "image": order.product.image,
+                "description": order.product.description,
+            } for order in cart.orders.all()
+        ]
+        total_sum = sum([
+            order.amount for order in cart.orders.all()
+        ])
+        context = {"customer": customer, "products": products, "total_sum": total_sum}
 
         return render(request, self.template_name, context=context)
 
@@ -211,7 +243,20 @@ class CheckoutView(View):
     def get(self, request):
         customer = Customer.objects.get(user=request.user)
         cart = Cart.objects.get(customer=customer)
-        context = {"customer": customer, "cart": cart}
+        products = [
+            {
+                "id": order.id,
+                "name": order.product.name,
+                "quantity": order.quantity,
+                "amount": order.amount,
+                "price": order.product.price,
+                "image": order.product.image,
+            } for order in cart.orders.all()
+        ]
+        total_sum = sum([
+            order.amount for order in cart.orders.all()
+        ])
+        context = {"customer": customer, "products": products, "total_sum": total_sum}
 
         return render(request, self.template_name, context=context)
 
@@ -235,6 +280,13 @@ class TransactionView(View):
     def get(self, request):
         customer = Customer.objects.get(user=request.user)
         transactions = Transaction.objects.filter(customer=customer)
-        context = {"transactions": transactions}
+        context = {"customer": customer, "transactions": transactions}
 
         return render(request, self.template_name, context=context)
+
+
+class Logout(View):
+
+    def get(self, request):
+        logout(request)
+        return HttpResponseRedirect(reverse("Store:home"))

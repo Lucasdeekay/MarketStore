@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<main>
+    <section class="checkout-items">
+        {% for product in products %}
+        <div class="checkout-item">
+            <img src="/media/{{ product.image }}" alt="{{ product.name }}">
+            <div class="item-details">
+                <h2>{{ product.name }}</h2>
+                <p>Price: ${{ product.price }}</p>
+                <p>Quantity: {{ product.quantity }}</p>
+                <p>Amount: ${{ product.amount }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </section>
+
+    <section class="checkout-summary">
+        <h2>Order Summary</h2>
+        <div class="summary-details">
+            <div class="summary-details">
+                <p>Total: ${{ total_sum }}</p>
+            </div>
+        </div>
+        <form action="" method="post" class="checkout-form">
+            {% csrf_token %}
+            <h3>Delivery Information</h3>
+            <label for="address">Address:</label>
+            <textarea id="address" name="address" required></textarea>
+            <button type="submit" class="checkout-button">Place Order</button>
+        </form>
+    </section>
+</main>
+{% endblock content %}
