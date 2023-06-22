@@ -34,7 +34,7 @@ class Order(models.Model):
 
 class Cart(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    orders = models.ManyToManyField(Order, on_delete=models.CASCADE)
+    orders = models.ManyToManyField(Order)
     total_amount = models.DecimalField()
     order_placed = models.BooleanField(default=False)
 
