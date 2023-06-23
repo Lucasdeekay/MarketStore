@@ -1,6 +1,7 @@
+import datetime
+
 from django.contrib.auth.models import User
 from django.db import models
-from django.utils import timezone
 
 
 # Create your models here.
@@ -20,7 +21,7 @@ class Category(models.Model):
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     name = models.CharField(max_length=250)
-    price = models.DecimalField(decimal_places=2)
+    price = models.DecimalField(decimal_places=2, max_digits=10)
     image = models.FileField(upload_to="product")
     description = models.CharField(max_length=1000)
 
@@ -29,13 +30,13 @@ class Order(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField()
-    amount = models.DecimalField()
+    amount = models.DecimalField(decimal_places=2, max_digits=10)
 
 
 class Cart(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     orders = models.ManyToManyField(Order)
-    total_amount = models.DecimalField()
+    total_amount = models.DecimalField(decimal_places=2, max_digits=10)
     order_placed = models.BooleanField(default=False)
 
     def calculate_total_cost(self):
@@ -50,4 +51,4 @@ class Transaction(models.Model):
     transaction_id = models.CharField(max_length=16)
     address = models.CharField(max_length=1000)
     is_success = models.BooleanField(default=False)
-    date = models.DateTimeField(default=timezone.now())
+    date = models.DateTimeField(default=datetime.datetime.now())

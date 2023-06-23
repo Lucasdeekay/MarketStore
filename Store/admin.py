@@ -25,7 +25,7 @@ class CartAdmin(admin.ModelAdmin):
 
 
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ('customer', 'order', 'is_success', 'date')
+    list_display = ('customer', 'cart', 'transaction_id', 'address', 'is_success', 'date')
 
 
 admin.site.register(Customer, CustomerAdmin)
