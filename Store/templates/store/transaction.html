@@ -22,7 +22,7 @@
                     <tr>
                         <td>{{ trans.customer.username }}</td>
                         <td>
-                            {% for order in trans.cart.orders.all() %}
+                            {% for order in trans.cart.orders.all %}
                             {{ order.product.name }}<br>
                             {% endfor %}
                         </td>
