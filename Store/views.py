@@ -53,7 +53,7 @@ class RegisterView(View):
         # Check if form is submitting
         if request.method == "POST":
             # Collect inputs
-            full_name = request.POST.get("full_name").strip().capitalize()
+            full_name = request.POST.get("full_name").strip().upper()
             username = request.POST.get("username").strip()
             email = request.POST.get("email").strip()
             password = request.POST.get("password")
@@ -285,8 +285,6 @@ class TransactionView(View):
         return render(request, self.template_name, context=context)
 
 
-class Logout(View):
-
-    def get(self, request):
-        logout(request)
-        return HttpResponseRedirect(reverse("Store:home"))
+def log_out(request):
+    logout(request)
+    return HttpResponseRedirect(reverse("Store:home"))
