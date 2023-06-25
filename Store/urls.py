@@ -1,6 +1,7 @@
 from django.contrib.auth.views import LogoutView
 from django.urls import path
 
+from Store import views
 from Store.views import HomeView, ProductView, CartView, CheckoutView, TransactionView, RemoveOrderView, StoreView, \
     LoginView, RegisterView, ForgotPasswordView, ChangePasswordView
 
