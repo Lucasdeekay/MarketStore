@@ -2,10 +2,10 @@
 {% load static %}
 
 {% block content %}
-<section class="hero">
-    <div class="hero-content">
+<section style="text-align: center; margin: 30px">
+    <div>
         <h2>Welcome to Angel Aesthetics</h2>
-        <p>Your one-stop destination for beauty and wellness products.</p>
+        <p style="margin: 10px"><i>"Your one-stop destination for beauty and wellness products."</i></p>
     </div>
 </section>
 
@@ -14,9 +14,9 @@
     <div class="product-grid">
         {% for category in all_categories %}
         <div class="product-item">
-            <img src="/media/{{ category.image }}" alt="Product 1">
+            <img src="{{ category.image.url }}" alt="Product 1">
             <h3>{{ category.name }}</h3>
-            <p>{{ category.description }}</p>
+            <p style="margin: 10px">{{ category.description }}</p>
             <a href="{% url 'Store:store' category.id %}" class="cta-button">View Products</a>
         </div>
         {% endfor %}

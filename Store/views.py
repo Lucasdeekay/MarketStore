@@ -133,7 +133,7 @@ class HomeView(View):
         all_categories = Category.objects.all()
         context = {"all_categories": all_categories}
 
-        if request.user.is_authenticated() and not request.user.is_superuser():
+        if request.user.is_authenticated and not request.user.is_superuser:
             customer = Customer.objects.get(user=request.user)
             context = {"customer": customer, "all_categories": all_categories}
 
@@ -148,7 +148,7 @@ class StoreView(View):
         products = Product.objects.filter(category=category)
         context = {"products": products}
 
-        if request.user.is_authenticated() and not request.user.is_superuser():
+        if request.user.is_authenticated and not request.user.is_superuser:
             customer = Customer.objects.get(user=request.user)
             context = {"customer": customer, "category": category, "products": products}
 
@@ -162,7 +162,7 @@ class ProductView(View):
         product = Product.objects.get(id=id)
         context = {"product": product}
 
-        if request.user.is_authenticated() and not request.user.is_superuser():
+        if request.user.is_authenticated and not request.user.is_superuser:
             customer = Customer.objects.get(user=request.user)
             context = {"customer": customer, "product": product}
 
@@ -174,8 +174,11 @@ class ProductView(View):
 
         customer = Customer.objects.get(user=request.user)
         product = Product.objects.get(id=id)
-        cart = Cart.objects.get(customer=customer)
-        amount = product.price * quantity
+        try:
+            cart = Cart.objects.get(customer=customer, order_placed=False)
+        except Exception:
+            Cart.objects.create(customer=customer)
+        amount = float(product.price) * float(quantity)
 
         if int(quantity) > 0:
             order = Order.objects.create(customer=customer, product=product, quantity=quantity, amount=amount)
@@ -195,29 +198,32 @@ class CartView(View):
     @method_decorator(login_required())
     def get(self, request):
         customer = Customer.objects.get(user=request.user)
-        carts = Cart.objects.filter(customer=customer, order_placed=False)
+        cart = Cart.objects.get(customer=customer, order_placed=False)
         transactions = Transaction.objects.filter(customer=customer, is_success=True)
-        for cart in carts:
-            for trans in transactions:
-                if trans.cart == cart:
-                    cart.order_placed = True
-                    cart.save()
+        for trans in transactions:
+            if trans.cart == cart:
+                cart.order_placed = True
+                cart.save()
 
-        cart = Cart.objects.filter(customer=customer, order_placed=False)
-        products = [
-            {
-                "id": order.id,
-                "name": order.product.name,
-                "quantity": order.quantity,
-                "amount": order.amount,
-                "price": order.product.price,
-                "image": order.product.image,
-                "description": order.product.description,
-            } for order in cart.orders.all()
-        ]
-        total_sum = sum([
-            order.amount for order in cart.orders.all()
-        ])
+        products = []
+        total_sum = 0
+        print(cart.total_amount)
+        try:
+            for order in cart.orders.all():
+                print(order)
+                product = {
+                        "id": order.id,
+                        "name": order.product.name,
+                        "quantity": order.quantity,
+                        "amount": order.amount,
+                        "price": order.product.price,
+                        "image": order.product.image,
+                        "description": order.product.description,
+                    }
+                total_sum += order.amount
+                products.append(product)
+        except Exception:
+            pass
         context = {"customer": customer, "products": products, "total_sum": total_sum}
 
         return render(request, self.template_name, context=context)
@@ -226,7 +232,7 @@ class CartView(View):
 class RemoveOrderView(View):
 
     @method_decorator(login_required())
-    def post(self, request, id):
+    def get(self, request, id):
         order = Order.objects.get(id=id)
         customer = Customer.objects.get(user=request.user)
         cart = Cart.objects.get(customer=customer)
@@ -242,7 +248,7 @@ class CheckoutView(View):
     @method_decorator(login_required())
     def get(self, request):
         customer = Customer.objects.get(user=request.user)
-        cart = Cart.objects.get(customer=customer)
+        cart = Cart.objects.get(customer=customer, order_placed=False)
         products = [
             {
                 "id": order.id,
@@ -270,7 +276,7 @@ class CheckoutView(View):
             [random.choice(string.ascii_letters + string.digits) for i in range(16)])
         Transaction.objects.create(customer=customer, cart=cart, transaction_id=trans_id, address=address)
         messages.success(request, "Transaction currently awaiting verification")
-        return HttpResponseRedirect(reverse("Store:transaction"))
+        return HttpResponseRedirect(reverse("Store:transactions"))
 
 
 class TransactionView(View):

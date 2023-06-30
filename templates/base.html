@@ -21,7 +21,7 @@
     <ul>
       <li><a href="{% url 'Store:home' %}">Home</a></li>
       <li><a href="{% url 'Store:cart' %}">Cart</a></li>
-      <li><a href="#">Contact</a></li>
+      <li><a href="{% url 'Store:transactions' %}">Transactions</a></li>
       {% if customer %}
       <li><a href="{% url 'Store:logout' %}">Logout</a></li>
       {% else %}

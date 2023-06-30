@@ -479,6 +479,8 @@ table {
 }
 th {
   padding: 10px;
+  text-align: center;
+  vertical-align: center;
 }
 tbody tr {
   background-color: chocolate;
@@ -486,4 +488,6 @@ tbody tr {
 td {
   padding: 10px;
   color: white;
+  text-align: center;
+  vertical-align: center;
 }
