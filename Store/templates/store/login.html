@@ -1,38 +1,39 @@
-{% extends 'base.html' %}
+{% extends 'auth.html' %}
 {% load static %}
 
 {% block content %}
 <main>
-    <section class="login-register">
-        <div class="login-form">
-            <h2>Login</h2>
-            <form action="" method="post" style="margin-bottom: 20px;">
-                {% csrf_token %}
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
-                <button type="submit" class="login-button">Login</button>
-            </form>
-            <a href="{% url 'Store:forgot_password' %}">Forgot Password?</a>
-        </div>
-        <div class="register-form">
-            <h2>Register</h2>
-            <form action="{% url 'Store:register' %}" method="post">
-                {% csrf_token %}
-                <label for="name">Full Name:</label>
-                <input type="text" id="name" name="full_name" required>
-                <label for="username2">Username:</label>
-                <input type="text" id="username2" name="username" required>
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-                <label for="password2">Password:</label>
-                <input type="password" id="password2" name="password" required>
-                <label for="confirm_password">Confirm Password:</label>
-                <input type="password" id="confirm_password" name="confirm_password" required>
-                <button type="submit" class="register-button">Register</button>
-            </form>
-        </div>
-    </section>
-</main>
+    <div class="container">
+      <div class="login-register">
+        <form action="" method="post" id="login-form" class="active">
+          {% csrf_token %}
+          <h2>Login</h2>
+          <label for="username">Username:</label>
+          <input type="text" id="username" name="username" required>
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password" required>
+          <button type="submit">Login</button>
+          <p><a href="{% url 'Store:forgot_password' %}">Forgot Password?</a></p>
+          <p class="toggle">Don't have an account? <a href="#" id="register-link">Register</a></p>
+        </form>
+
+        <form action="{% url 'Store:register' %}" method="post" id="register-form">
+          {% csrf_token %}
+          <h2>Register</h2>
+          <label for="name">Full Name:</label>
+          <input type="text" id="name" name="full_name" required>
+          <label for="username2">Username:</label>
+          <input type="text" id="username2" name="username" required>
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" required>
+          <label for="password2">Password:</label>
+          <input type="password" id="password2" name="password" required>
+          <label for="confirm_password">Confirm Password:</label>
+          <input type="password" id="confirm_password" name="confirm_password" required>
+          <button type="submit">Register</button>
+          <p class="toggle">Already have an account? <a href="#" id="login-link">Login</a></p>
+        </form>
+      </div>
+    </div>
+  </main>
 {% endblock content %}
