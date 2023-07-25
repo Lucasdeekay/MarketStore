@@ -3,10 +3,17 @@
 
 {% block content %}
 <main>
+
+    {% for msg in messages %}
+        <div class="container">
+            <h5>{{ msg }}</h5>
+        </div>
+        {% endfor %}
+
     <section class="checkout-items">
         {% for product in products %}
         <div class="checkout-item">
-            <img src="/media/{{ product.image }}" alt="{{ product.name }}">
+            <img src="/media/{{ product.image }}" alt="{{ product.name }}" style="width:200px">
             <div class="item-details">
                 <h2>{{ product.name }}</h2>
                 <p>Price: ${{ product.price }}</p>

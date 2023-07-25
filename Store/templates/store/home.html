@@ -2,6 +2,12 @@
 {% load static %}
 
 {% block content %}
+{% for msg in messages %}
+        <div class="container">
+            <h5>{{ msg }}</h5>
+        </div>
+        {% endfor %}
+
 <section style="text-align: center; margin: 30px">
     <div>
         <h2>Welcome to Angel Aesthetics</h2>

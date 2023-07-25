@@ -3,6 +3,13 @@
 
 {% block content %}
 <main>
+
+    {% for msg in messages %}
+        <div class="container">
+            <h5>{{ msg }}</h5>
+        </div>
+        {% endfor %}
+
     <h2>{{ category.name }}</h2>
     <section class="store">
         <div class="store-items">
@@ -12,6 +19,10 @@
                 <h3>{{ product.name }}</h3>
                 <p>Price: ${{ product.price }}</p>
                 <a href="{% url 'Store:product' product.id %}"><button class="add-to-cart">View Product</button></a>
+            </div>
+            {% empty %}
+            <div class="cart-item">
+                <h4>Products are currently unavailable</h4>
             </div>
             {% endfor %}
         </div>

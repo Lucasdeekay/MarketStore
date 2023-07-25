@@ -3,6 +3,13 @@
 
 {% block content %}
 <main>
+
+    {% for msg in messages %}
+        <div class="container">
+            <h5>{{ msg }}</h5>
+        </div>
+        {% endfor %}
+
     <h2 style="margin:20px">Transactions</h2>
     <section class="cart-items">
         <div class="product-grid">
@@ -18,7 +25,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% if transactions %}
                     {% for trans in transactions %}
                     <tr>
                         <td>{{ trans.customer.username }}</td>
@@ -38,12 +44,11 @@
                             {% endif %}
                         </td>
                     </tr>
-                    {% endfor %}
-                    {% else %}
+                    {% empty %}
                     <tr>
                         <td colspan="6">No transactions made yet</td>
                     </tr>
-                    {% endif %}
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

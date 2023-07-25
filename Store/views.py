@@ -120,10 +120,10 @@ class ChangePasswordView(View):
             customer.user.set_password(password)
             customer.user.save()
             messages.success(request, "Password update successful")
-            return HttpResponseRedirect(reverse("Assignment:login"))
+            return HttpResponseRedirect(reverse("Store:login"))
         else:
             messages.error(request, "Password does not match")
-            return HttpResponseRedirect(reverse("Assignment:change_password", args=(customer.id,)))
+            return HttpResponseRedirect(reverse("Store:change_password", args=(customer.id,)))
 
 
 class HomeView(View):
@@ -177,7 +177,7 @@ class ProductView(View):
         try:
             cart = Cart.objects.get(customer=customer, order_placed=False)
         except Exception:
-            Cart.objects.create(customer=customer)
+            cart = Cart.objects.create(customer=customer)
         amount = float(product.price) * float(quantity)
 
         if int(quantity) > 0:
@@ -198,19 +198,16 @@ class CartView(View):
     @method_decorator(login_required())
     def get(self, request):
         customer = Customer.objects.get(user=request.user)
-        cart = Cart.objects.get(customer=customer, order_placed=False)
-        transactions = Transaction.objects.filter(customer=customer, is_success=True)
-        for trans in transactions:
-            if trans.cart == cart:
-                cart.order_placed = True
-                cart.save()
+
+        try:
+            cart = Cart.objects.get(customer=customer, order_placed=False)
+        except Exception:
+            cart = Cart.objects.create(customer=customer)
 
         products = []
         total_sum = 0
-        print(cart.total_amount)
         try:
             for order in cart.orders.all():
-                print(order)
                 product = {
                         "id": order.id,
                         "name": order.product.name,
@@ -271,10 +268,14 @@ class CheckoutView(View):
         address = request.POST.get("address")
 
         customer = Customer.objects.get(user=request.user)
-        cart = Cart.objects.get(customer=customer)
+        cart = Cart.objects.get(customer=customer, order_placed=False)
         trans_id = ''.join(
             [random.choice(string.ascii_letters + string.digits) for i in range(16)])
         Transaction.objects.create(customer=customer, cart=cart, transaction_id=trans_id, address=address)
+
+        cart.order_placed = True
+        cart.save()
+
         messages.success(request, "Transaction currently awaiting verification")
         return HttpResponseRedirect(reverse("Store:transactions"))
 

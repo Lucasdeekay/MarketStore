@@ -3,6 +3,13 @@
 
 {% block content %}
 <main>
+
+    {% for msg in messages %}
+        <div class="container">
+            <h5>{{ msg }}</h5>
+        </div>
+        {% endfor %}
+
     <section class="store">
         <div class="store-info">
             <h2>{{ product.name }}</h2>
